@@ -7,9 +7,11 @@
 
 <script>
 export default {
-  name: 'EventCard',
   props: {
-    event: Object
+    event: {
+      type: Object,
+      required: true
+    }
   }
 }
 </script>
