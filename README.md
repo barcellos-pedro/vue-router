@@ -1,4 +1,4 @@
-# real-world-vue
+# vue-router
 
 ## Project setup
 ```
