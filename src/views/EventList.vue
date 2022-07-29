@@ -1,8 +1,8 @@
 <template>
   <h1>Events for Good</h1>
   <div class="query">
-    <p>{{ totalEvents }} events found</p>
-    <div>
+    <h2>{{ totalEvents }} events found</h2>
+    <div v-if="totalEvents > limit">
       <label for="limit">Per page</label>
       <select v-model="limit" id="limit">
         <option value="2" :selected="limit == 2">2</option>
@@ -24,14 +24,39 @@
     <EventCard v-for="event in events" :key="event.id" :event="event" />
   </div>
 
+  <!-- Pagination Links -->
   <div class="pagination">
-    <!-- Pagination Links -->
     <router-link
       v-if="page != 1"
       id="page-prev"
       rel="prev"
       :to="{ name: 'EventList', query: { page: page - 1 } }"
       >&#60; Previous</router-link
+    >
+
+    <router-link
+      v-if="page != 1"
+      rel="prev"
+      :to="{ name: 'EventList', query: { page: page - 1 } }"
+      >{{ page - 1 }}</router-link
+    >
+
+    <router-link
+      id="current-page"
+      :to="{
+        name: 'EventList',
+        query: {
+          page: page
+        }
+      }"
+      >{{ page }}</router-link
+    >
+
+    <router-link
+      v-if="hasNextPage"
+      rel="next"
+      :to="{ name: 'EventList', query: { page: page + 1 } }"
+      >{{ page + 1 }}</router-link
     >
 
     <router-link
@@ -103,12 +128,25 @@ export default {
 .pagination {
   display: flex;
   justify-content: center;
-  gap: 5em;
+  gap: 2em;
 }
 
 .pagination a {
   text-decoration: none;
   color: #2c3e50;
+  padding: 0.5em 1em;
+  border-radius: 4px;
+  border: 1px solid #42b983;
+}
+
+.pagination a:hover {
+  background-color: #42b983;
+  color: white;
+}
+
+#current-page {
+  background-color: #42b983;
+  color: white;
 }
 
 #page-prev {
@@ -121,9 +159,5 @@ export default {
 
 label {
   margin-right: 1em;
-}
-
-h2 {
-  margin: 2em 0;
 }
 </style>
