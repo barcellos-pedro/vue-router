@@ -6,7 +6,7 @@
       <router-link :to="{ name: 'EventRegister' }">Register</router-link>
       <router-link :to="{ name: 'EventEdit' }">Edit</router-link>
     </div>
-    <!-- Pass the prop event to all chidren routes -->
+    <!-- Load all chidren routes sending the prop event -->
     <router-view :event="event" />
   </div>
 </template>

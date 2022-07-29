@@ -18,13 +18,53 @@ const routes = [
     props: route => ({ page: +route.query.page || 1 })
   },
   {
+    path: '/event/create',
+    name: 'EventCreate',
+    component: CreateEvent
+  },
+  {
+    path: '/about-us',
+    name: 'About',
+    component: About
+    // alias: '/about'
+  },
+  /**
+   * We can redirect the route in 2 ways
+   * with alias (example above)
+   * or
+   * redirect, better for SEO (example below)
+   */
+  {
+    path: '/about',
+    redirect: { name: 'About' }
+  },
+  {
     path: '/event/:id',
+    // redirect: to => {
+    //   return { name: 'EventDetails', params: { id: to.params.id } }
+    // },
+
+    /**
+     * In this case and for the children
+     * we dont need the param {id}
+     * because its the same param name
+     * It will be passed through automatically
+     */
+    redirect: () => ({ name: 'EventDetails' }),
+    /** redirecting children routes */
+    children: [
+      { path: 'register', redirect: () => ({ name: 'EventRegister' }) },
+      { path: 'edit', redirect: () => ({ name: 'EventEdit' }) }
+    ]
+  },
+  {
+    path: '/events/:id',
     name: 'EventLayout',
     props: true,
     component: EventLayout,
     children: [
       {
-        path: '',
+        path: '', // same path as the parent
         name: 'EventDetails',
         component: EventDetails
       },
@@ -39,16 +79,6 @@ const routes = [
         component: EventEdit
       }
     ]
-  },
-  {
-    path: '/event/create',
-    name: 'EventCreate',
-    component: CreateEvent
-  },
-  {
-    path: '/about',
-    name: 'About',
-    component: About
   }
 ]
 
