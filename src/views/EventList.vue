@@ -1,40 +1,130 @@
 <template>
   <h1>Events for Good</h1>
+  <!-- TODO: Select Tag to choose API limit -->
+  <div class="query">
+    <p>{{ totalEvents }} events found</p>
+    <div>
+      <label for="limit">Per page</label>
+      <select v-model="limit" id="limit">
+        <option value="2" :selected="limit == 2">2</option>
+        <option value="5" :selected="limit == 5">5</option>
+        <option value="7" :selected="limit == 7">7</option>
+      </select>
+    </div>
+  </div>
+
+  <div v-if="!events && !error">
+    <h2>Loading events...</h2>
+  </div>
+
+  <div v-if="error">
+    <h2>There was an error. Try again</h2>
+  </div>
+
   <div class="events">
     <EventCard v-for="event in events" :key="event.id" :event="event" />
+  </div>
+
+  <div class="pagination">
+    <!-- Pagination Links -->
+    <router-link
+      v-if="page != 1"
+      id="page-prev"
+      rel="prev"
+      :to="{ name: 'EventList', query: { page: page - 1 } }"
+      >&#60; Previous</router-link
+    >
+
+    <router-link
+      v-if="hasNextPage"
+      id="page-next"
+      rel="next"
+      :to="{ name: 'EventList', query: { page: page + 1 } }"
+      >Next &#62;</router-link
+    >
   </div>
 </template>
 
 <script>
+import { watchEffect } from 'vue'
 import EventCard from '@/components/EventCard.vue'
 import EventService from '@/services/EventService.js'
 
 export default {
   name: 'EventList',
+  props: ['page'],
   components: {
     EventCard
   },
-  data() {
-    return {
-      events: null
-    }
-  },
+  data: () => ({
+    events: null,
+    totalEvents: 0,
+    limit: 2,
+    error: ''
+  }),
+  // Runs only once the component is loaded, but not when reused (route change)
+  // To achieve pagination we chose to use #watchEffect
   created() {
-    EventService.getEvents()
-      .then(response => {
+    // Workaround for created()
+    // Runs every time page or limit changes
+    watchEffect(async () => {
+      try {
+        this.events = null
+        const response = await EventService.getEvents(this.limit, this.page)
         this.events = response.data
-      })
-      .catch(error => {
-        console.log(error)
-      })
+        this.totalEvents = response.headers['x-total-count']
+      } catch (err) {
+        this.error = err
+      }
+    })
+  },
+  computed: {
+    hasNextPage() {
+      const totalPages = Math.ceil(this.totalEvents / this.limit)
+      return this.page < totalPages
+    }
   }
 }
 </script>
 
 <style scoped>
+.query {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5em;
+  margin: 2em 0;
+}
 .events {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 5em;
+}
+
+.pagination a {
+  text-decoration: none;
+  color: #2c3e50;
+}
+
+#page-prev {
+  text-align: left;
+}
+
+#page-prev {
+  text-align: right;
+}
+
+label {
+  margin-right: 1em;
+}
+
+h2 {
+  margin: 2em 0;
 }
 </style>

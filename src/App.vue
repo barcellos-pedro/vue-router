@@ -1,7 +1,8 @@
 <template>
   <div id="app">
     <div id="nav">
-      <router-link :to="{ name: 'EventList' }">Events</router-link> |
+      <router-link :to="{ name: 'EventList' }">Events</router-link>
+      <router-link :to="{ name: 'EventCreate' }">Create</router-link>
       <router-link :to="{ name: 'About' }">About</router-link>
     </div>
     <router-view />
@@ -20,11 +21,15 @@
 
 #nav {
   padding: 30px;
+  display: flex;
+  justify-content: center;
+  gap: 1em;
 }
 
 #nav a {
   font-weight: bold;
   color: #2c3e50;
+  text-decoration: none;
 }
 
 #nav a.router-link-exact-active {
