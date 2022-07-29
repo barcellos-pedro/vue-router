@@ -10,6 +10,7 @@ const routes = [
     path: '/',
     name: 'EventList',
     component: EventList,
+    // Sends to the component the page prop equals to query param or default to 1
     props: route => ({ page: +route.query.page || 1 })
   },
   {

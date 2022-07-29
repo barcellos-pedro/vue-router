@@ -1,6 +1,5 @@
 <template>
   <h1>Events for Good</h1>
-  <!-- TODO: Select Tag to choose API limit -->
   <div class="query">
     <p>{{ totalEvents }} events found</p>
     <div>
