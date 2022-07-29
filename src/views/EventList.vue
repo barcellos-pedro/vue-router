@@ -149,15 +149,12 @@ export default {
   color: white;
 }
 
-#page-prev {
-  text-align: left;
-}
-
-#page-prev {
-  text-align: right;
-}
-
 label {
   margin-right: 1em;
+}
+
+select {
+  padding: 0.5em 1em;
+  border-radius: 4px;
 }
 </style>
