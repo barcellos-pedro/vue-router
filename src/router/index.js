@@ -3,6 +3,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import EventList from '../views/EventList.vue'
 import CreateEvent from '../views/CreateEvent.vue'
 import About from '../views/About.vue'
+import NotFound from '../views/NotFound.vue'
+import NetworkError from '../views/NetworkError.vue'
 
 import EventLayout from '../views/event/Layout.vue'
 import EventDetails from '../views/event/Details.vue'
@@ -40,6 +42,7 @@ const routes = [
   },
   {
     path: '/event/:id',
+    // passing an function to grab the route props like: params or query
     // redirect: to => {
     //   return { name: 'EventDetails', params: { id: to.params.id } }
     // },
@@ -50,17 +53,17 @@ const routes = [
      * because its the same param name
      * It will be passed through automatically
      */
-    redirect: () => ({ name: 'EventDetails' }),
+    redirect: { name: 'EventDetails' },
     /** redirecting children routes */
     children: [
       { path: 'register', redirect: () => ({ name: 'EventRegister' }) },
-      { path: 'edit', redirect: () => ({ name: 'EventEdit' }) }
+      { path: 'edit', redirect: { name: 'EventEdit' } }
     ]
   },
   {
     path: '/events/:id',
     name: 'EventLayout',
-    props: true,
+    props: true, // pass {id} as component props
     component: EventLayout,
     children: [
       {
@@ -79,6 +82,26 @@ const routes = [
         component: EventEdit
       }
     ]
+  },
+  // Any page that doesn't exist
+  {
+    path: '/:catchAll(.*)',
+    name: 'NotFound',
+    component: NotFound
+  },
+  // Resource that doesn't exist. e.g: /events/jalksdj
+  // we use programmatically
+  {
+    path: '/404/:resource',
+    name: '404Resource',
+    component: NotFound,
+    props: true
+  },
+  // Network error, like API call
+  {
+    path: '/network-error',
+    name: 'NetworkError',
+    component: NetworkError
   }
 ]
 

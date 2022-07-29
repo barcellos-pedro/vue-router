@@ -21,12 +21,25 @@ export default {
   data: () => ({
     event: null
   }),
+  methods: {
+    handleError(error) {
+      if (error.response || error.response.status == 404) {
+        this.$router.push({
+          name: '404Resource',
+          params: { resource: 'event' }
+        })
+      } else {
+        this.$router.push({ name: 'NetworkError' })
+      }
+    }
+  },
   async created() {
     try {
-      const response = await EventService.getEvent(this.id)
-      this.event = response.data
+      const { data } = await EventService.getEvent(this.id)
+      this.event = data
     } catch (error) {
       console.log(error)
+      this.handleError(error)
     }
   }
 }
