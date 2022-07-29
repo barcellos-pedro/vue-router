@@ -2,6 +2,8 @@
   <div v-if="event">
     <h1>{{ event.title }}</h1>
     <div id="nav">
+      <!-- In these router-links we dont need the {id} param 
+      since this component route (layout) already requires an {id} -->
       <router-link :to="{ name: 'EventDetails' }">Details</router-link>
       <router-link :to="{ name: 'EventRegister' }">Register</router-link>
       <router-link :to="{ name: 'EventEdit' }">Edit</router-link>

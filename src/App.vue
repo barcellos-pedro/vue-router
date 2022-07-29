@@ -39,4 +39,17 @@
 h4 {
   font-size: 20px;
 }
+
+button {
+  border: none;
+  padding: 14px 18px;
+  border-radius: 4px;
+  background-color: #41bd84;
+  color: aliceblue;
+  font-weight: bold;
+}
+
+button:hover {
+  cursor: pointer;
+}
 </style>
