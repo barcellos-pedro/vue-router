@@ -72,7 +72,6 @@
 <script>
 import EventCard from '@/components/EventCard.vue'
 import EventService from '@/services/EventService.js'
-import NProgress from 'nprogress'
 // import { watchEffect } from 'vue'
 
 export default {
@@ -116,7 +115,6 @@ export default {
    */
   async beforeRouteEnter(routeTo, routeFrom, next) {
     try {
-      NProgress.start()
       const page = +routeTo.query.page || 1
       const response = await EventService.getEvents(2, page)
       // next to access component instance
@@ -128,8 +126,6 @@ export default {
       // if there's an network issue, we redirect the user
       // so we don't enter the page and don't even create the component
       next({ name: 'NetworkError' })
-    } finally {
-      NProgress.done()
     }
   },
   /**
@@ -140,15 +136,12 @@ export default {
    */
   async beforeRouteUpdate(routeTo) {
     try {
-      NProgress.start()
       const page = +routeTo.query.page || 1
       const response = await EventService.getEvents(2, page)
       this.events = response.data
       this.totalEvents = response.headers['x-total-count']
     } catch (err) {
       return { name: 'NetworkError' }
-    } finally {
-      NProgress.done()
     }
   },
   computed: {

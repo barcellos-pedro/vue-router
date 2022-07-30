@@ -1,21 +1,13 @@
-import { createApp, reactive } from 'vue'
+import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 import 'nprogress/nprogress.css'
-
 // instead of using Pinia
 // here we are using an reactive object for simple case
-const globalStore = reactive({
-  flashMessage: '',
-  setFlashMessage(text) {
-    this.flashMessage = text
-  },
-  clearFlashMessage() {
-    this.flashMessage = ''
-  }
-})
+import globalStore from './store'
 
 createApp(App)
   .use(router)
-  .provide('globalStore', globalStore) // make available for all components to use (inject)
+  // make available for all components to use (inject)
+  .provide('globalStore', globalStore)
   .mount('#app')

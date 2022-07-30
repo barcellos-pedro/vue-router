@@ -78,8 +78,14 @@ import { v4 as uuid } from 'uuid'
 import EventService from '../services/EventService'
 
 export default {
-  // with no return value navigation continues
-  // in this case we dont need the params (routeTo, routeForm, next)
+  /**
+   * Called when route is navigated away from
+   *
+   * Has access to this (component instance)
+   *
+   * With no return value navigation continues
+   * in this case we dont need the params (routeTo, routeForm, next)
+   */
   beforeRouteLeave() {
     if (this.unsavedChanges) {
       const answer = window.confirm(

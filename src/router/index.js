@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import NProgress from 'nprogress'
 
 import EventList from '../views/EventList.vue'
 import CreateEvent from '../views/CreateEvent.vue'
@@ -10,6 +11,9 @@ import EventLayout from '../views/event/Layout.vue'
 import EventDetails from '../views/event/Details.vue'
 import EventRegister from '../views/event/Register.vue'
 import EventEdit from '../views/event/Edit.vue'
+
+import EventService from '@/services/EventService.js'
+import globalStore from '@/store'
 
 const routes = [
   {
@@ -65,9 +69,29 @@ const routes = [
     name: 'EventLayout',
     props: true, // pass {id} as component props
     component: EventLayout,
+    // Per-Route Guards
+    beforeEnter: async to => {
+      try {
+        const { data } = await EventService.getEvent(to.params.id)
+        globalStore.event = data
+      } catch (error) {
+        if (error.response || error.response.status == 404) {
+          return {
+            name: '404Resource',
+            params: { resource: 'event' }
+          }
+        } else {
+          return { name: 'NetworkError' }
+        }
+      }
+    },
     children: [
       {
-        path: '', // same path as the parent
+        /**
+         * first component to load if path = /events/:id
+         * same path as the parent
+         */
+        path: '',
         name: 'EventDetails',
         component: EventDetails
       },
@@ -109,6 +133,24 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
+})
+
+/**
+ * Global Navigation Guards
+ *
+ * There are 3:
+ *
+ * beforeEach (before each navigation and before in-component guards)
+ * beforeResolve (before each navigation, but after in-component guards)
+ * afterEach (after navigation is complete)
+ */
+
+router.beforeEach(() => {
+  NProgress.start()
+})
+
+router.afterEach(() => {
+  NProgress.done()
 })
 
 export default router
