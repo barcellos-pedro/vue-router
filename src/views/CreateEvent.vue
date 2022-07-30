@@ -78,6 +78,19 @@ import { v4 as uuid } from 'uuid'
 import EventService from '../services/EventService'
 
 export default {
+  // with no return value navigation continues
+  // in this case we dont need the params (routeTo, routeForm, next)
+  beforeRouteLeave() {
+    if (this.unsavedChanges) {
+      const answer = window.confirm(
+        'There are unsaved changes. Do you want to leave?'
+      )
+      // stays on the page
+      if (!answer) {
+        return false
+      }
+    }
+  },
   data: () => ({
     event: {
       category: '',
@@ -88,8 +101,18 @@ export default {
       time: '',
       organizer: ''
     },
-    message: ''
+    message: '',
+    unsavedChanges: false
   }),
+  watch: {
+    // Deep Watcher to watch event object
+    event: {
+      handler() {
+        this.unsavedChanges = true
+      },
+      deep: true
+    }
+  },
   methods: {
     scrollTop() {
       window.scrollTo({ top: 0, behavior: 'smooth' })

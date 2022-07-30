@@ -10,6 +10,7 @@
   "dependencies": {
     "core-js": "^3.6.5",
     "json-server": "^0.17.0",
+    "nprogress": "^0.2.0",
     "uuid": "^8.3.2",
     "vee-validate": "^4.6.2",
     "vue": "^3.0.0-0",

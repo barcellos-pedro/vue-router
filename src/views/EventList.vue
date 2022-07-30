@@ -70,9 +70,10 @@
 </template>
 
 <script>
-import { watchEffect } from 'vue'
 import EventCard from '@/components/EventCard.vue'
 import EventService from '@/services/EventService.js'
+import NProgress from 'nprogress'
+// import { watchEffect } from 'vue'
 
 export default {
   name: 'EventList',
@@ -86,22 +87,69 @@ export default {
     limit: 2,
     error: ''
   }),
-  // Runs only once the component is loaded, but not when reused (route change)
-  // To achieve pagination we chose to use #watchEffect
-  created() {
-    // Workaround for created()
-    // Runs every time page or limit changes
-    watchEffect(async () => {
-      try {
-        this.events = null
-        const response = await EventService.getEvents(this.limit, this.page)
-        this.events = response.data
-        this.totalEvents = response.headers['x-total-count']
-      } catch (err) {
-        this.error = err
-        this.$router.push({ name: 'NetworkError' })
-      }
-    })
+  /**
+   * [Before In-Component Route Guard]
+   * Runs only once the component is loaded, but not when reused (route change)
+   * In this case to achieve pagination we use #watchEffect
+   */
+  // created() {
+  //   // Workaround for created()
+  //   // Runs every time page or limit changes
+  //   watchEffect(async () => {
+  //     try {
+  //       this.events = null
+  //       const response = await EventService.getEvents(this.limit, this.page)
+  //       this.events = response.data
+  //       this.totalEvents = response.headers['x-total-count']
+  //     } catch (err) {
+  //       this.error = err
+  //       this.$router.push({ name: 'NetworkError' })
+  //     }
+  //   })
+  // },
+  /** API call to In-Component Route Guard
+   *
+   *  There are 3: beforeRouteEnter, beforeRouteUpdate and beforeRouteLeave
+   *
+   * Called before component is created and
+   * when entered from a different route
+   */
+  async beforeRouteEnter(routeTo, routeFrom, next) {
+    try {
+      NProgress.start()
+      const page = +routeTo.query.page || 1
+      const response = await EventService.getEvents(2, page)
+      // next to access component instance
+      next(component => {
+        component.events = response.data
+        component.totalEvents = response.headers['x-total-count']
+      })
+    } catch (err) {
+      // if there's an network issue, we redirect the user
+      // so we don't enter the page and don't even create the component
+      next({ name: 'NetworkError' })
+    } finally {
+      NProgress.done()
+    }
+  },
+  /**
+   * Called when route changes, but the component still the same
+   *
+   * In this hook we have access to this (component instance)
+   * We use this hook to ensure pagination still works
+   */
+  async beforeRouteUpdate(routeTo) {
+    try {
+      NProgress.start()
+      const page = +routeTo.query.page || 1
+      const response = await EventService.getEvents(2, page)
+      this.events = response.data
+      this.totalEvents = response.headers['x-total-count']
+    } catch (err) {
+      return { name: 'NetworkError' }
+    } finally {
+      NProgress.done()
+    }
   },
   computed: {
     hasNextPage() {
