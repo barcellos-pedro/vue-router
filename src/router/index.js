@@ -98,6 +98,7 @@ const routes = [
     props: true
   },
   // Network error, like API call
+  // we use programmatically
   {
     path: '/network-error',
     name: 'NetworkError',

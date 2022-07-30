@@ -23,6 +23,7 @@ export default {
   }),
   methods: {
     handleError(error) {
+      // event not found
       if (error.response || error.response.status == 404) {
         this.$router.push({
           name: '404Resource',

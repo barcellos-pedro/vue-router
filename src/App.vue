@@ -1,5 +1,8 @@
 <template>
   <div id="app">
+    <div id="flashMessage" v-if="globalStore.flashMessage">
+      {{ globalStore.flashMessage }}
+    </div>
     <div id="nav">
       <router-link :to="{ name: 'EventList' }">Events</router-link>
       <router-link :to="{ name: 'EventCreate' }">Create</router-link>
@@ -9,8 +12,27 @@
   </div>
 </template>
 
+<script>
+export default {
+  inject: ['globalStore']
+}
+</script>
+
 <style>
 /* Global styles */
+@keyframes yellowfade {
+  from {
+    background: yellow;
+  }
+  to {
+    background: transparent;
+  }
+}
+
+#flashMessage {
+  animation: yellowfade 3s;
+}
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
