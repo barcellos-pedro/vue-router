@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router'
 import NProgress from 'nprogress'
 
 import EventList from '../views/EventList.vue'
-import CreateEvent from '../views/CreateEvent.vue'
 import About from '../views/About.vue'
 import NotFound from '../views/NotFound.vue'
 import NetworkError from '../views/NetworkError.vue'
@@ -14,6 +13,10 @@ import EventEdit from '../views/event/Edit.vue'
 
 import EventService from '@/services/EventService.js'
 import globalStore from '@/store'
+
+// Lazy loading
+const CreateEvent = () =>
+  import(/* webpackChunkName: "event-create" */ '../views/CreateEvent.vue')
 
 const routes = [
   {
@@ -69,7 +72,12 @@ const routes = [
     name: 'EventLayout',
     props: true, // pass {id} as component props
     component: EventLayout,
-    // Per-Route Guards
+    /**
+     * Per-Route Guard
+     *
+     * We put the API call here
+     * removing the responsibility from the Layout component
+     */
     beforeEnter: async to => {
       try {
         const { data } = await EventService.getEvent(to.params.id)
@@ -103,7 +111,14 @@ const routes = [
       {
         path: 'edit',
         name: 'EventEdit',
-        component: EventEdit
+        component: EventEdit,
+        /**
+         * Route meta field
+         *
+         * If the parent had a meta field
+         * all children would inherit the meta automatically
+         */
+        meta: { requireAuth: true }
       }
     ]
   },
@@ -131,8 +146,15 @@ const routes = [
 ]
 
 const router = createRouter({
+  routes,
   history: createWebHistory(process.env.BASE_URL),
-  routes
+  /**
+   * Always move the page to the top on navigation
+   * and if the user goes back (<) scroll to the last position
+   */
+  scrollBehavior(to, from, savedPosition) {
+    return savedPosition ? savedPosition : { top: 0 }
+  }
 })
 
 /**
@@ -145,12 +167,26 @@ const router = createRouter({
  * afterEach (after navigation is complete)
  */
 
-router.beforeEach(() => {
+router.beforeEach((to, from) => {
   NProgress.start()
+
+  // Example of authorization
+  const notAuthorized = true
+  // if current route has this metaproperty and the user is not authorized
+  if (to.meta.requireAuth && notAuthorized) {
+    globalStore.setFlashMessage(
+      'Sorry, you are not authorized to view this page'
+    )
+    setTimeout(() => globalStore.clearFlashMessage(), 3000)
+
+    /**
+     * if there was a previous page (from.href), then cancel the navigation
+     * if the user try to access directly from url, redirects
+     */
+    return from.href ? false : { name: 'EventList' }
+  }
 })
 
-router.afterEach(() => {
-  NProgress.done()
-})
+router.afterEach(() => NProgress.done())
 
 export default router
